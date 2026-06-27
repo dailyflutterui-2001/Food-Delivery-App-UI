@@ -11,6 +11,7 @@ class CheckoutScreen extends StatefulWidget {
 
   final double subtotal;
 
+  /// Express delivery fee. Standard is free — see [_CheckoutScreenState].
   static const double deliveryFee = 2.50;
 
   static Route<void> route(double subtotal) => MaterialPageRoute(
@@ -25,6 +26,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   int _payment = 0;
   int _delivery = 0;
 
+  // Delivery option drives both the fee and the estimated arrival time, so the
+  // summary and the tracking ETA stay consistent with what was chosen.
+  double get _deliveryFee => _delivery == 0 ? CheckoutScreen.deliveryFee : 0.0;
+  int get _etaMinutes => _delivery == 0 ? 20 : 38;
+
   static const _payments = [
     (icon: Icons.account_balance_wallet_rounded, label: 'Wallet', sub: 'Balance \$84.20'),
     (icon: Icons.credit_card_rounded, label: 'Card', sub: '•••• 4821'),
@@ -33,7 +39,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final total = widget.subtotal + CheckoutScreen.deliveryFee;
+    final total = widget.subtotal + _deliveryFee;
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
@@ -93,10 +99,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ),
             _SummaryBar(
               subtotal: widget.subtotal,
-              deliveryFee: CheckoutScreen.deliveryFee,
+              deliveryFee: _deliveryFee,
               total: total,
-              onPlace: () =>
-                  Navigator.of(context).push(OrderSuccessScreen.route(total)),
+              onPlace: () => Navigator.of(context).push(
+                OrderSuccessScreen.route(total, etaMinutes: _etaMinutes),
+              ),
             ),
           ],
         ),

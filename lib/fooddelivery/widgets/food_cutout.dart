@@ -56,7 +56,7 @@ class CutoutThumb extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Colors.white, AppColors.surfaceAlt],
+          colors: [AppColors.card, AppColors.surfaceAlt],
         ),
         borderRadius: BorderRadius.circular(radius),
         border: Border.all(color: AppColors.hairline),

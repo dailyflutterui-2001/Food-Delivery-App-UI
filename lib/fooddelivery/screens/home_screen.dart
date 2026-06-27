@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../data/foods.dart';
 import '../models/food.dart';
 import '../theme/app_theme.dart';
+import '../theme/food_theme.dart';
 import '../widgets/food_cutout.dart';
 import 'detail_screen.dart';
 import 'discover_screen.dart';
@@ -40,11 +41,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      bottom: false,
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 28),
-        children: [
+    // The shell holds this tab as a `const` child, so it won't rebuild on its
+    // own when the Daylight⇄Midnight morph fires. Subscribe to the theme here
+    // so the whole feed recolours live along with the rest of the app.
+    return ListenableBuilder(
+      listenable: FoodTheme.instance,
+      builder: (context, _) => SafeArea(
+        bottom: false,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 28),
+          children: [
           const _Header(),
           const SizedBox(height: 26),
           Text('What would you like\nto eat today?',
@@ -92,7 +98,8 @@ class _HomeScreenState extends State<HomeScreen> {
             _ListCard(food: food),
             const SizedBox(height: 14),
           ],
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -113,9 +120,7 @@ class _Header extends StatelessWidget {
                 const Icon(Icons.location_on,
                     size: 15, color: AppColors.primary),
                 const SizedBox(width: 4),
-                Text('DELIVER TO', style: TextStyle(
-                  color: Colors.black87
-                )),
+                Text('DELIVER TO', style: AppText.eyebrow),
               ],
             ),
             const SizedBox(height: 6),
@@ -141,7 +146,7 @@ class _NotificationButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: AppColors.card,
       shape: const CircleBorder(),
       child: InkWell(
         customBorder: const CircleBorder(),
@@ -166,7 +171,7 @@ class _NotificationButton extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.primary,
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 1.5),
+                  border: Border.all(color: AppColors.card, width: 1.5),
                 ),
               ),
             ),
@@ -186,7 +191,7 @@ class _SearchField extends StatelessWidget {
       height: 56,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.card,
         borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(color: AppColors.hairline),
       ),
@@ -315,8 +320,10 @@ class _FeaturedCard extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text('Order now',
+                            // Pill is always white on the dark promo, so keep a
+                            // fixed dark ink rather than the reactive token.
                             style: AppText.label.copyWith(
-                              color: AppColors.textPrimary,
+                              color: const Color(0xFF17151F),
                               fontWeight: FontWeight.w700,
                             )),
                         const SizedBox(width: 6),
@@ -408,7 +415,7 @@ class _CategoryRow extends StatelessWidget {
               curve: Curves.easeOut,
               padding: const EdgeInsets.symmetric(horizontal: 18),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.primary : Colors.white,
+                color: isSelected ? AppColors.primary : AppColors.card,
                 borderRadius: BorderRadius.circular(AppRadius.sm),
                 border: Border.all(
                   color: isSelected ? AppColors.primary : AppColors.hairline,
@@ -450,7 +457,7 @@ class _PhotoCard extends StatelessWidget {
       child: Container(
         width: 196,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.card,
           borderRadius: BorderRadius.circular(AppRadius.lg),
           border: Border.all(color: AppColors.hairline),
           boxShadow: AppShadows.card,
@@ -468,7 +475,7 @@ class _PhotoCard extends StatelessWidget {
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors: [Colors.white, AppColors.surfaceAlt],
+                      colors: [AppColors.card, AppColors.surfaceAlt],
                     ),
                   ),
                   child: Stack(
@@ -578,7 +585,7 @@ class _FrostedPill extends StatelessWidget {
           ? const EdgeInsets.all(7)
           : const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.92),
+        color: AppColors.card.withValues(alpha: 0.92),
         borderRadius:
             circle ? null : BorderRadius.circular(20),
         shape: circle ? BoxShape.circle : BoxShape.rectangle,
@@ -601,7 +608,7 @@ class _ListCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.card,
           borderRadius: BorderRadius.circular(AppRadius.lg),
           border: Border.all(color: AppColors.hairline),
           boxShadow: AppShadows.card,

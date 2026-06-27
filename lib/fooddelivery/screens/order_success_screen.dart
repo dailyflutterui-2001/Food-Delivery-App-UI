@@ -5,15 +5,22 @@ import 'package:flutter/material.dart';
 import '../state/cart.dart';
 import '../theme/app_theme.dart';
 import '../widgets/primary_button.dart';
+import 'order_tracking_screen.dart';
 
 /// Order-confirmed screen with a springy check-mark and a soft confetti burst.
 class OrderSuccessScreen extends StatefulWidget {
-  const OrderSuccessScreen({super.key, required this.total});
+  const OrderSuccessScreen({
+    super.key,
+    required this.total,
+    this.etaMinutes = 20,
+  });
 
   final double total;
+  final int etaMinutes;
 
-  static Route<void> route(double total) => MaterialPageRoute(
-        builder: (_) => OrderSuccessScreen(total: total),
+  static Route<void> route(double total, {int etaMinutes = 20}) =>
+      MaterialPageRoute(
+        builder: (_) => OrderSuccessScreen(total: total, etaMinutes: etaMinutes),
       );
 
   @override
@@ -121,10 +128,30 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
               ),
               const Spacer(),
               PrimaryButton(
-                label: 'Back to home',
-                icon: Icons.home_rounded,
+                label: 'Track your order',
+                icon: Icons.location_on_rounded,
+                onPressed: () => Navigator.of(context).push(
+                  OrderTrackingScreen.route(
+                    total: widget.total,
+                    etaMinutes: widget.etaMinutes,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
                 onPressed: () =>
                     Navigator.of(context).popUntil((r) => r.isFirst),
+                style: TextButton.styleFrom(
+                  minimumSize: const Size.fromHeight(48),
+                  foregroundColor: AppColors.textSecondary,
+                ),
+                child: Text(
+                  'Back to home',
+                  style: AppText.title.copyWith(
+                    fontSize: 14.5,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
               ),
             ],
           ),

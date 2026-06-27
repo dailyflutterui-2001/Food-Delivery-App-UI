@@ -5,6 +5,7 @@ import 'package:latlong2/latlong.dart';
 import '../data/foods.dart';
 import '../models/food.dart';
 import '../theme/app_theme.dart';
+import '../theme/food_theme.dart';
 import '../widgets/food_cutout.dart';
 import '../widgets/info_pill.dart';
 
@@ -20,6 +21,9 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   static const _center = LatLng(-6.9175, 107.6191); // Bandung-ish
   final _mapController = MapController();
+  // Held as a field (not created inline in build) so rebuilds — including the
+  // theme morph — never reset the card strip's scroll position.
+  final _pageController = PageController(viewportFraction: 0.86);
   int _active = 0;
 
   /// Scatter the dishes around the centre so each gets a distinct pin.
@@ -53,14 +57,19 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void dispose() {
     _mapController.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        FlutterMap(
+    // Recolour the floating chip and cards live when the app morphs between
+    // Daylight and Midnight (the shell holds this tab as a `const` child).
+    return ListenableBuilder(
+      listenable: FoodTheme.instance,
+      builder: (context, _) => Stack(
+        children: [
+          FlutterMap(
           mapController: _mapController,
           options: const MapOptions(
             initialCenter: _center,
@@ -118,7 +127,7 @@ class _MapScreenState extends State<MapScreen> {
             child: SizedBox(
               height: 148,
               child: PageView.builder(
-                controller: PageController(viewportFraction: 0.86),
+                controller: _pageController,
                 onPageChanged: _select,
                 itemCount: kFoods.length,
                 itemBuilder: (context, i) => Padding(
@@ -130,6 +139,7 @@ class _MapScreenState extends State<MapScreen> {
           ),
         ),
       ],
+      ),
     );
   }
 }
@@ -174,7 +184,7 @@ class _NearbyCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.card,
           borderRadius: BorderRadius.circular(AppRadius.lg),
           border: Border.all(color: AppColors.hairline),
           boxShadow: AppShadows.floating,
@@ -232,7 +242,7 @@ class _GlassChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.card,
         borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(color: AppColors.hairline),
         boxShadow: AppShadows.card,

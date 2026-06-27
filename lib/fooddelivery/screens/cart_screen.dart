@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/food.dart';
 import '../state/cart.dart';
 import '../theme/app_theme.dart';
+import '../theme/food_theme.dart';
 import '../widgets/food_cutout.dart';
 import '../widgets/primary_button.dart';
 import '../widgets/quantity_stepper.dart';
@@ -19,7 +20,10 @@ class CartScreen extends StatelessWidget {
     return SafeArea(
       bottom: false,
       child: ListenableBuilder(
-        listenable: cart,
+        // Rebuild on cart changes *and* on the Daylight⇄Midnight theme morph,
+        // since the shell holds this tab as a `const` child that won't otherwise
+        // recolour.
+        listenable: Listenable.merge([cart, FoodTheme.instance]),
         builder: (context, _) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,7 +129,7 @@ class _CartTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.card,
         borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: AppColors.hairline),
         boxShadow: AppShadows.card,
@@ -182,7 +186,7 @@ class _CheckoutBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 22, 24, 24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.card,
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(AppRadius.xl),
         ),
